@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from generators.unified import Grammar, LangConfig
+from generators.world import COLORS, SIZES
 from eval.tiny_transformer import TinyGPT
 
 
@@ -126,7 +127,138 @@ def probe_role_swap(model, stoi, cfg: LangConfig, n=500) -> dict:
             "avg_swapped_nll": total_swap_nll / tries}
 
 
-def run_all_probes(model_path: Path, cfg: LangConfig, label: str) -> dict:
+def probe_agreement(model, stoi, cfg: LangConfig, n=500) -> dict:
+    """Subject-verb agreement across a relative clause.
+
+    Requires cfg.allow_plural_subjects=True. Builds minimal pairs where the
+    only difference is the main verb's agreement form; the correct form
+    agrees with the (possibly distant) subject head, not the nearer noun
+    inside the relative clause.
+    """
+    if not cfg.allow_plural_subjects:
+        return {"skipped": True, "reason": "cfg.allow_plural_subjects=False"}
+    # Force plural subjects + relative clauses at test time
+    test_cfg = LangConfig(**{**cfg.__dict__,
+                             "seed": cfg.seed + 3000,
+                             "allow_plural_subjects": True,
+                             "plural_subject_prob": 1.0,
+                             "allow_relative": True,
+                             "allow_complement": False,
+                             "allow_coordination": False,
+                             "max_clause_depth": 1})
+    g = Grammar(test_cfg)
+    wins = 0; tries = 0
+    total_c = 0.0; total_w = 0.0
+    while tries < n:
+        g.world.new()
+        clause = g._mk_svo(tense="present")
+        # require plural subject AND a relative modifier for a real test
+        if not clause.subject.plural or clause.subject.modifier is None:
+            continue
+        # object inside rel clause must differ in number from subject (always
+        # singular here since we only plural-ify subject NPs)
+        correct = g._realize(clause)
+        # build wrong-agreement variant: flip plural on subject used only at
+        # verb realization. We rebuild with subject flagged singular for verb.
+        R = g.realizer
+        s = R.np(clause.subject)
+        o = R.np(clause.object)
+        v_wrong = R.verb(clause.verb, clause.tense, False)
+        wrong = R.arrange(s, o, v_wrong) + ["."]
+        if correct == wrong:
+            continue  # agreement unmarked in this form (shouldn't happen here)
+        c_nll = sentence_nll(model, stoi, correct)
+        w_nll = sentence_nll(model, stoi, wrong)
+        total_c += c_nll; total_w += w_nll
+        if c_nll < w_nll:
+            wins += 1
+        tries += 1
+    return {"n": tries, "correct_preferred_pct": wins / tries,
+            "avg_correct_nll": total_c / tries,
+            "avg_wrong_nll": total_w / tries}
+
+
+def probe_grounded_qa(model, stoi, cfg: LangConfig, n=500) -> dict:
+    """Internal-consistency probe on copular sentences.
+
+    For a sentence "the [ADJ] [N] is [VAL]" where ADJ and VAL are the same
+    property kind (e.g., color), the correct variant has ADJ == VAL
+    (consistent) and the distractor has ADJ != VAL (contradicting itself).
+    A model that has learned compositional semantics prefers the
+    consistent one.
+    """
+    test_cfg = LangConfig(**{**cfg.__dict__,
+                             "seed": cfg.seed + 4000,
+                             "allow_plural_subjects": False,
+                             "grounded_fraction": 1.0,
+                             "max_clause_depth": 0})
+    g = Grammar(test_cfg)
+    wins = 0; tries = 0
+    total_c = 0.0; total_w = 0.0
+    attempts = 0
+    while tries < n and attempts < n * 20:
+        attempts += 1
+        g.world.new()
+        clause = g._mk_cop()
+        # need an adjective and a property that's color or size
+        if clause.property_kind not in ("color", "size"):
+            continue
+        # force subject NP to have an adjective OF THE SAME KIND
+        ent = clause.subject.entity
+        if ent.etype == "person":
+            continue
+        if clause.property_kind == "color" and ent.color:
+            clause.subject.adjective = f"color:{ent.color}"
+            correct_val = ent.color
+        elif clause.property_kind == "size" and ent.size:
+            clause.subject.adjective = f"size:{ent.size}"
+            correct_val = ent.size
+        else:
+            continue
+        # build the consistent version (ADJ == VAL)
+        clause.property_value = correct_val
+        consistent = g._realize(clause)
+        # build the inconsistent version with a different value of same kind
+        alt_pool = [c for c in (COLORS if clause.property_kind == "color" else SIZES)
+                    if c != correct_val]
+        bad_val = g.rng.choice(alt_pool)
+        clause.property_value = bad_val
+        inconsistent = g._realize(clause)
+        c_nll = sentence_nll(model, stoi, consistent)
+        w_nll = sentence_nll(model, stoi, inconsistent)
+        total_c += c_nll; total_w += w_nll
+        if c_nll < w_nll:
+            wins += 1
+        tries += 1
+    if tries == 0:
+        return {"skipped": True, "reason": "no eligible sentences generated"}
+    return {"n": tries, "consistent_preferred_pct": wins / tries,
+            "avg_consistent_nll": total_c / tries,
+            "avg_inconsistent_nll": total_w / tries}
+
+
+def probe_recursion_ladder(model, stoi, cfg: LangConfig,
+                            depths=(0, 1, 2, 3), n=300) -> dict:
+    """Held-out PP at multiple max_clause_depth settings.
+
+    A flat or mildly increasing curve = arch handles recursion; a cliff
+    = fails at some depth.
+    """
+    results = {}
+    for d in depths:
+        test_cfg = LangConfig(**{**cfg.__dict__,
+                                 "seed": cfg.seed + 6000 + d,
+                                 "max_clause_depth": d})
+        g = Grammar(test_cfg)
+        sents = [toks for toks, _ in g.generate(n)]
+        results[f"depth_{d}"] = corpus_pp(model, stoi, sents)
+    return results
+
+
+def run_all_probes(model_path: Path, cfg: LangConfig, label: str,
+                    enable_agreement: bool = False,
+                    enable_grounded_qa: bool = False,
+                    enable_recursion: bool = False) -> dict:
     model, stoi, itos = load_model(model_path)
     print(f"\n=== Probes: {label} ===")
     pp = probe_held_out(model, stoi, cfg)
@@ -134,12 +266,29 @@ def run_all_probes(model_path: Path, cfg: LangConfig, label: str) -> dict:
     s = probe_structure(model, stoi, cfg)
     print(f"  real PP:           {s['real_pp']:.3f}")
     print(f"  shuffled PP:       {s['shuffled_pp']:.3f}")
-    print(f"  structure ratio:   {s['ratio']:.3f}x  (higher = more structure-aware)")
+    print(f"  structure ratio:   {s['ratio']:.3f}x")
     r = probe_role_swap(model, stoi, cfg)
     print(f"  role-swap correct: {r['correct_preferred_pct']*100:.1f}% of {r['n']}")
-    print(f"    avg NLL correct: {r['avg_correct_nll']:.3f}")
-    print(f"    avg NLL swapped: {r['avg_swapped_nll']:.3f}")
-    return {"held_out_pp": pp, "structure": s, "role_swap": r}
+    out = {"held_out_pp": pp, "structure": s, "role_swap": r}
+    if enable_agreement:
+        a = probe_agreement(model, stoi, cfg)
+        if a.get("skipped"):
+            print(f"  agreement:         skipped ({a['reason']})")
+        else:
+            print(f"  agreement correct: {a['correct_preferred_pct']*100:.1f}% of {a['n']}")
+        out["agreement"] = a
+    if enable_grounded_qa:
+        q = probe_grounded_qa(model, stoi, cfg)
+        if q.get("skipped"):
+            print(f"  grounded-qa:       skipped ({q['reason']})")
+        else:
+            print(f"  grounded-qa consistent: {q['consistent_preferred_pct']*100:.1f}% of {q['n']}")
+        out["grounded_qa"] = q
+    if enable_recursion:
+        ladder = probe_recursion_ladder(model, stoi, cfg)
+        print(f"  recursion ladder:  " + "  ".join(f"{k}={v:.1f}" for k, v in ladder.items()))
+        out["recursion_ladder"] = ladder
+    return out
 
 
 if __name__ == "__main__":

@@ -78,6 +78,8 @@ class LangConfig:
     allow_relative: bool = True
     allow_complement: bool = True
     allow_coordination: bool = True
+    allow_plural_subjects: bool = False   # enables agreement probes
+    plural_subject_prob: float = 0.3       # only used when allow_plural_subjects
     max_clause_depth: int = 2
 
     # corpus knobs
@@ -113,17 +115,22 @@ class EnglishRealizer:
             toks.append(ent.name)
         else:
             if self.cfg.articles:
-                toks.append("the" if np.definite else "a")
+                if np.plural:
+                    # plural indefinite: bare; plural definite: "the"
+                    if np.definite:
+                        toks.append("the")
+                else:
+                    toks.append("the" if np.definite else "a")
             if np.adjective:
                 toks.append(np.adjective.split(":")[1])
             toks.append(self.noun(ent.kind, np.plural))
         if np.modifier:
-            toks += self.rel(ent, np.modifier)
+            toks += self.rel(np, np.modifier)
         return toks
 
-    def rel(self, head: Entity, clause: AbsClause) -> list[str]:
-        marker = "who" if head.etype == "person" else "that"
-        v = self.verb(clause.verb, clause.tense, False)
+    def rel(self, head_np: AbsNP, clause: AbsClause) -> list[str]:
+        marker = "who" if head_np.entity.etype == "person" else "that"
+        v = self.verb(clause.verb, clause.tense, head_np.plural)
         obj_toks = self.np(clause.object)
         return [marker, v] + obj_toks
 
@@ -134,10 +141,12 @@ class EnglishRealizer:
         if order == "OVS":  return o + [v] + s
         return s + [v] + o
 
-    def copular(self, np_toks: list[str], prop_kind: str, value: str) -> list[str]:
+    def copular(self, np_toks: list[str], prop_kind: str, value: str,
+                plural_subj: bool = False) -> list[str]:
+        be = "are" if plural_subj else "is"
         if prop_kind == "location":
-            return np_toks + ["is", "in", "the", value]
-        return np_toks + ["is", value]
+            return np_toks + [be, "in", "the", value]
+        return np_toks + [be, value]
 
     def connective(self, conn: str) -> str:
         return conn
@@ -197,6 +206,8 @@ class AgglutinativeRealizer:
         s = self.dict[lemma]
         if tense == "past":
             s += "du"
+        if plural_subj:
+            s += "ta"
         return s
 
     def np(self, np: AbsNP) -> list[str]:
@@ -215,12 +226,12 @@ class AgglutinativeRealizer:
                 toks.append(self.dict[np.adjective.split(":")[1]])
             toks.append(self.noun(ent.kind, np.plural, case, np.definite))
         if np.modifier:
-            toks += self.rel(ent, np.modifier)
+            toks += self.rel(np, np.modifier)
         return toks
 
-    def rel(self, head: Entity, clause: AbsClause) -> list[str]:
+    def rel(self, head_np: AbsNP, clause: AbsClause) -> list[str]:
         obj_toks = self.np(clause.object)
-        v = self.verb(clause.verb, clause.tense, False)
+        v = self.verb(clause.verb, clause.tense, head_np.plural)
         return obj_toks + [v, "ke"]
 
     def arrange(self, s: list[str], o: list[str], v: str) -> list[str]:
@@ -233,11 +244,13 @@ class AgglutinativeRealizer:
         if order == "OVS":   return o + [v] + s
         return s + o + [v]
 
-    def copular(self, np_toks: list[str], prop_kind: str, value: str) -> list[str]:
+    def copular(self, np_toks: list[str], prop_kind: str, value: str,
+                plural_subj: bool = False) -> list[str]:
+        cop = "vo" + ("ta" if plural_subj else "")
         if prop_kind == "location":
             loc_tok = self.noun(value, False, "loc", True)
-            return np_toks + [loc_tok, "vo"]
-        return np_toks + [self.dict[value], "vo"]
+            return np_toks + [loc_tok, cop]
+        return np_toks + [self.dict[value], cop]
 
     def connective(self, conn: str) -> str:
         return {"because": "ra", "while": "zu", "after": "to", "before": "fi"}[conn]
@@ -273,9 +286,17 @@ class Grammar:
 
     # --- abstract builders ---
     def _mk_np(self, ent: Entity, role: str, definite: Optional[bool] = None,
-               depth: int = 0) -> AbsNP:
+               depth: int = 0, plural: Optional[bool] = None) -> AbsNP:
         if definite is None:
             definite = self.rng.random() < 0.7
+        if plural is None:
+            # only non-persons can be plural, and only when enabled
+            if (self.cfg.allow_plural_subjects and ent.etype != "person"
+                    and role == "nom"
+                    and self.rng.random() < self.cfg.plural_subject_prob):
+                plural = True
+            else:
+                plural = False
         adj = None
         if ent.etype != "person" and self.rng.random() < 0.4:
             if ent.color and self.rng.random() < 0.6:
@@ -292,8 +313,8 @@ class Grammar:
                 verb=self.rng.choice(self.transitive),
                 object=self._mk_np(other, "acc", definite=True, depth=depth + 1),
             )
-        return AbsNP(entity=ent, role=role, definite=definite, adjective=adj,
-                     modifier=modifier)
+        return AbsNP(entity=ent, role=role, definite=definite, plural=plural,
+                     adjective=adj, modifier=modifier)
 
     def _mk_svo(self, tense: str) -> AbsClause:
         subj = self.rng.choice(self.world.agents())
@@ -338,21 +359,23 @@ class Grammar:
     # --- realization ---
     def _realize(self, clause: AbsClause) -> list[str]:
         R = self.realizer
+        subj_pl = bool(clause.subject and clause.subject.plural)
         if clause.kind == "SVO":
             s = R.np(clause.subject)
             o = R.np(clause.object)
-            v = R.verb(clause.verb, clause.tense, False)
+            v = R.verb(clause.verb, clause.tense, subj_pl)
             return R.arrange(s, o, v) + ["."]
         if clause.kind == "SV":
             s = R.np(clause.subject)
-            v = R.verb(clause.verb, clause.tense, False)
+            v = R.verb(clause.verb, clause.tense, subj_pl)
             return s + [v, "."]
         if clause.kind == "COP":
             s = R.np(clause.subject)
-            return R.copular(s, clause.property_kind, clause.property_value) + ["."]
+            return R.copular(s, clause.property_kind, clause.property_value,
+                             plural_subj=subj_pl) + ["."]
         if clause.kind == "COMP":
             outer_s = R.np(clause.subject)
-            outer_v = R.verb(clause.verb, clause.tense, False)
+            outer_v = R.verb(clause.verb, clause.tense, subj_pl)
             inner = self._realize_non_final(clause.inner)
             return R.complement_assemble(outer_s, outer_v, inner) + ["."]
         if clause.kind == "SUB":

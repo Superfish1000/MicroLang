@@ -18,10 +18,12 @@ from eval.probes import run_all_probes
 PRESETS = {
     "english": LangConfig(morphology="english", word_order="SVO",
                            articles=True, case_marking=False,
-                           grounded_fraction=0.5, max_clause_depth=2, seed=1),
+                           grounded_fraction=0.5, max_clause_depth=2,
+                           allow_plural_subjects=True, seed=1),
     "agglutinative": LangConfig(morphology="agglutinative", word_order="SOV",
                                  articles=False, case_marking=True,
                                  grounded_fraction=0.5, max_clause_depth=2,
+                                 allow_plural_subjects=True,
                                  seed=1, lexicon_seed=1),
 }
 
@@ -31,7 +33,21 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--sentences", type=int, default=20000)
     ap.add_argument("--steps", type=int, default=1500)
+    ap.add_argument("--agreement", action="store_true",
+                    help="run subject-verb agreement-across-distance probe")
+    ap.add_argument("--grounded-qa", action="store_true",
+                    help="run internal-consistency grounded-QA probe")
+    ap.add_argument("--recursion", action="store_true",
+                    help="run recursion-depth ladder probe")
+    ap.add_argument("--all-probes", action="store_true",
+                    help="enable all extended probes")
     args = ap.parse_args()
+
+    probe_flags = {
+        "enable_agreement":   args.agreement   or args.all_probes,
+        "enable_grounded_qa": args.grounded_qa or args.all_probes,
+        "enable_recursion":   args.recursion   or args.all_probes,
+    }
 
     out_dir = ROOT / "corpora"
     out_dir.mkdir(exist_ok=True)
@@ -60,7 +76,7 @@ def main():
                          heads=4, lr=3e-4, log_every=max(1, args.steps // 10),
                          save_path=str(model_path))
 
-        probes = run_all_probes(model_path, cfg, label=name)
+        probes = run_all_probes(model_path, cfg, label=name, **probe_flags)
         results[name] = {"stats": stats,
                          "training": {k: v for k, v in tr.items() if k != "history"},
                          "probes": probes}

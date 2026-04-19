@@ -12,6 +12,18 @@ from eval.run_unified import PRESETS
 
 
 def main():
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--agreement", action="store_true")
+    ap.add_argument("--grounded-qa", action="store_true")
+    ap.add_argument("--recursion", action="store_true")
+    ap.add_argument("--all-probes", action="store_true")
+    args = ap.parse_args()
+    flags = {
+        "enable_agreement":   args.agreement   or args.all_probes,
+        "enable_grounded_qa": args.grounded_qa or args.all_probes,
+        "enable_recursion":   args.recursion   or args.all_probes,
+    }
     models_dir = ROOT / "models"
     out = {}
     for name, cfg in PRESETS.items():
@@ -19,7 +31,7 @@ def main():
         if not model_path.exists():
             print(f"skip {name}: no model at {model_path}")
             continue
-        out[name] = run_all_probes(model_path, cfg, label=name)
+        out[name] = run_all_probes(model_path, cfg, label=name, **flags)
 
     with (ROOT / "report" / "probes_fixed.json").open("w") as f:
         json.dump(out, f, indent=2, default=str)

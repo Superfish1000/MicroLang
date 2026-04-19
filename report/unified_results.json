@@ -2,76 +2,112 @@
   "english": {
     "stats": {
       "n_sentences": 20000,
-      "n_tokens": 152282,
-      "vocab_size": 151,
-      "type_token_ratio": 0.0009915814081769348,
-      "unigram_entropy_nats": 4.049532624879234,
-      "unigram_perplexity": 57.37063716998738,
-      "zipf_slope": -0.9561530596151007,
-      "bigram_perplexity": 16.233863793471375,
-      "avg_sent_len": 7.6141,
+      "n_tokens": 150636,
+      "vocab_size": 210,
+      "type_token_ratio": 0.0013940890623755278,
+      "unigram_entropy_nats": 4.155803608215973,
+      "unigram_perplexity": 63.803216740891536,
+      "zipf_slope": -1.2441362094407946,
+      "bigram_perplexity": 18.740318770445842,
+      "avg_sent_len": 7.5318,
       "sent_len_p50": 6,
       "sent_len_p90": 13,
       "sent_len_p99": 20,
-      "trigram_perplexity": 22.502233876578778
+      "trigram_perplexity": 29.199152678799532
     },
     "training": {
-      "n_params": 821120,
-      "vocab_size": 153,
-      "final_train": 2.6932883262634277,
-      "final_val": 2.723386764526367,
-      "val_perplexity": 15.231821580668074
+      "n_params": 828672,
+      "vocab_size": 212,
+      "final_train": 2.8271634578704834,
+      "final_val": 2.870346784591675,
+      "val_perplexity": 17.643135506624674
     },
     "probes": {
-      "held_out_pp": 62.1012788119033,
+      "held_out_pp": 21.968491306668962,
       "structure": {
-        "real_pp": 59.25105335738883,
-        "shuffled_pp": 2116.147040174013,
-        "ratio": 35.71492691294275
+        "real_pp": 22.26744079979571,
+        "shuffled_pp": 616.4762871736204,
+        "ratio": 27.685098288406643
       },
       "role_swap": {
         "n": 500,
-        "correct_preferred_pct": 0.796,
-        "avg_correct_nll": 24.83600298690796,
-        "avg_swapped_nll": 27.94141307067871
+        "correct_preferred_pct": 0.764,
+        "avg_correct_nll": 17.188231870651244,
+        "avg_swapped_nll": 18.75121460533142
+      },
+      "agreement": {
+        "n": 500,
+        "correct_preferred_pct": 0.064,
+        "avg_correct_nll": 37.072468242645265,
+        "avg_wrong_nll": 34.652619541168214
+      },
+      "grounded_qa": {
+        "n": 500,
+        "consistent_preferred_pct": 0.508,
+        "avg_consistent_nll": 13.92027193069458,
+        "avg_inconsistent_nll": 13.949461553573608
+      },
+      "recursion_ladder": {
+        "depth_0": 23.14270681061261,
+        "depth_1": 22.24389218660993,
+        "depth_2": 21.87178917736308,
+        "depth_3": 22.31441335166896
       }
     }
   },
   "agglutinative": {
     "stats": {
       "n_sentences": 20000,
-      "n_tokens": 121933,
-      "vocab_size": 193,
-      "type_token_ratio": 0.00158283647576948,
-      "unigram_entropy_nats": 4.524479630023869,
-      "unigram_perplexity": 92.24791029394223,
-      "zipf_slope": -0.7697551874909804,
-      "bigram_perplexity": 28.990353074070068,
-      "avg_sent_len": 6.09665,
+      "n_tokens": 121254,
+      "vocab_size": 296,
+      "type_token_ratio": 0.002441156580401471,
+      "unigram_entropy_nats": 4.676234274795856,
+      "unigram_perplexity": 107.36500326140097,
+      "zipf_slope": -1.1267804953869778,
+      "bigram_perplexity": 38.06721475663771,
+      "avg_sent_len": 6.0627,
       "sent_len_p50": 5,
       "sent_len_p90": 11,
       "sent_len_p99": 16,
-      "trigram_perplexity": 50.21294074490679
+      "trigram_perplexity": 74.38807963076854
     },
     "training": {
-      "n_params": 826496,
-      "vocab_size": 195,
-      "final_train": 3.322335720062256,
-      "final_val": 3.356111526489258,
-      "val_perplexity": 28.67746224081865
+      "n_params": 839680,
+      "vocab_size": 298,
+      "final_train": 3.5447843074798584,
+      "final_val": 3.611293315887451,
+      "val_perplexity": 37.01389252748617
     },
     "probes": {
-      "held_out_pp": 1307006.5688097107,
+      "held_out_pp": 89.04551743172084,
       "structure": {
-        "real_pp": 1312678.9892511065,
-        "shuffled_pp": 2394170.177011194,
-        "ratio": 1.823880930993713
+        "real_pp": 88.22501004508464,
+        "shuffled_pp": 928.3935180747997,
+        "ratio": 10.523019692492786
       },
       "role_swap": {
         "n": 500,
-        "correct_preferred_pct": 0.036,
-        "avg_correct_nll": 64.11706980895995,
-        "avg_swapped_nll": 64.10574716186524
+        "correct_preferred_pct": 0.752,
+        "avg_correct_nll": 21.147201110839845,
+        "avg_swapped_nll": 25.320359895706176
+      },
+      "agreement": {
+        "n": 500,
+        "correct_preferred_pct": 0.01,
+        "avg_correct_nll": 41.295029617309574,
+        "avg_wrong_nll": 39.13618254089356
+      },
+      "grounded_qa": {
+        "n": 500,
+        "consistent_preferred_pct": 0.496,
+        "avg_consistent_nll": 19.855542961120605,
+        "avg_inconsistent_nll": 19.802489974975586
+      },
+      "recursion_ladder": {
+        "depth_0": 104.9184784135079,
+        "depth_1": 93.59071149641258,
+        "depth_2": 91.3371710104518,
+        "depth_3": 87.72587529810482
       }
     }
   }

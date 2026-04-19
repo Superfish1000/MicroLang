@@ -1,61 +1,63 @@
 
 
 ########## PRESET: english ##########
-Generated 20000 sentences. vocab=151
-step     1  train 85.0799  val 82.3745  (0.4s)
-step   150  train 4.9106  val 4.8636  (26.2s)
-step   300  train 3.8104  val 3.8873  (59.6s)
-step   450  train 3.3849  val 3.4457  (94.8s)
-step   600  train 3.1380  val 3.1546  (130.9s)
-step   750  train 2.9225  val 2.9634  (156.5s)
-step   900  train 2.8700  val 2.8992  (180.8s)
-step  1050  train 2.7677  val 2.7657  (209.7s)
-step  1200  train 2.7171  val 2.8209  (233.1s)
-step  1350  train 2.7312  val 2.8024  (257.7s)
-step  1500  train 2.6933  val 2.7234  (278.1s)
+Generated 20000 sentences. vocab=210
+step     1  train 82.6231  val 79.6642  (0.4s)
+step   150  train 4.9865  val 5.0351  (35.8s)
+step   300  train 3.9224  val 4.0065  (73.5s)
+step   450  train 3.5558  val 3.6147  (110.5s)
+step   600  train 3.2965  val 3.3225  (139.5s)
+step   750  train 3.1345  val 3.1784  (164.5s)
+step   900  train 3.0294  val 3.0450  (189.3s)
+step  1050  train 2.9073  val 2.9915  (219.8s)
+step  1200  train 2.9929  val 2.9430  (247.6s)
+step  1350  train 2.8285  val 2.8973  (280.1s)
+step  1500  train 2.8272  val 2.8703  (305.2s)
 
 === Probes: english ===
-  held-out PP:       62.101
-  real PP:           59.251
-  shuffled PP:       2116.147
-  structure ratio:   35.715x  (higher = more structure-aware)
-  role-swap correct: 79.6% of 500
-    avg NLL correct: 24.836
-    avg NLL swapped: 27.941
+  held-out PP:       21.968
+  real PP:           22.267
+  shuffled PP:       616.476
+  structure ratio:   27.685x
+  role-swap correct: 76.4% of 500
+  agreement correct: 6.4% of 500
+  grounded-qa consistent: 50.8% of 500
+  recursion ladder:  depth_0=23.1  depth_1=22.2  depth_2=21.9  depth_3=22.3
 
 
 ########## PRESET: agglutinative ##########
-Generated 20000 sentences. vocab=193
-step     1  train 84.3673  val 81.8431  (0.4s)
-step   150  train 6.1405  val 6.2762  (28.6s)
-step   300  train 4.5246  val 4.4985  (53.3s)
-step   450  train 4.0104  val 4.0987  (75.8s)
-step   600  train 3.8169  val 3.7954  (107.4s)
-step   750  train 3.6450  val 3.6765  (133.2s)
-step   900  train 3.5864  val 3.5118  (163.7s)
-step  1050  train 3.4521  val 3.4756  (189.4s)
-step  1200  train 3.4224  val 3.4023  (221.6s)
-step  1350  train 3.3346  val 3.4010  (246.3s)
-step  1500  train 3.3223  val 3.3561  (270.2s)
+Generated 20000 sentences. vocab=296
+step     1  train 85.1084  val 82.6638  (0.4s)
+step   150  train 6.4700  val 6.4201  (29.8s)
+step   300  train 4.8667  val 4.7338  (56.7s)
+step   450  train 4.3271  val 4.3612  (84.7s)
+step   600  train 4.1413  val 4.1220  (113.7s)
+step   750  train 3.9606  val 3.9828  (137.4s)
+step   900  train 3.8168  val 3.8505  (161.3s)
+step  1050  train 3.6914  val 3.7210  (189.0s)
+step  1200  train 3.6629  val 3.6489  (215.5s)
+step  1350  train 3.6010  val 3.5746  (244.1s)
+step  1500  train 3.5448  val 3.6113  (268.8s)
 
 === Probes: agglutinative ===
-  held-out PP:       1307006.569
-  real PP:           1312678.989
-  shuffled PP:       2394170.177
-  structure ratio:   1.824x  (higher = more structure-aware)
-  role-swap correct: 3.6% of 500
-    avg NLL correct: 64.117
-    avg NLL swapped: 64.106
+  held-out PP:       89.046
+  real PP:           88.225
+  shuffled PP:       928.394
+  structure ratio:   10.523x
+  role-swap correct: 75.2% of 500
+  agreement correct: 1.0% of 500
+  grounded-qa consistent: 49.6% of 500
+  recursion ladder:  depth_0=104.9  depth_1=93.6  depth_2=91.3  depth_3=87.7
 
 
 ================ UNIFIED SUMMARY ================
 
 english
-  vocab=151  tokens=152282  zipf=-0.956
-  trigram_pp=22.50  transformer val_pp=15.23
-  probes: held_out_pp=62.10  structure_ratio=35.71x  role_swap_correct=79.6%
+  vocab=210  tokens=150636  zipf=-1.244
+  trigram_pp=29.20  transformer val_pp=17.64
+  probes: held_out_pp=21.97  structure_ratio=27.69x  role_swap_correct=76.4%
 
 agglutinative
-  vocab=193  tokens=121933  zipf=-0.770
-  trigram_pp=50.21  transformer val_pp=28.68
-  probes: held_out_pp=1307006.57  structure_ratio=1.82x  role_swap_correct=3.6%
+  vocab=296  tokens=121254  zipf=-1.127
+  trigram_pp=74.39  transformer val_pp=37.01
+  probes: held_out_pp=89.05  structure_ratio=10.52x  role_swap_correct=75.2%
