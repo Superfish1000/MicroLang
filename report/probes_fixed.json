@@ -1,0 +1,30 @@
+{
+  "english": {
+    "held_out_pp": 62.1012788119033,
+    "structure": {
+      "real_pp": 59.25105335738883,
+      "shuffled_pp": 2116.147040174013,
+      "ratio": 35.71492691294275
+    },
+    "role_swap": {
+      "n": 500,
+      "correct_preferred_pct": 0.796,
+      "avg_correct_nll": 24.83600298690796,
+      "avg_swapped_nll": 27.94141307067871
+    }
+  },
+  "agglutinative": {
+    "held_out_pp": 70.30742626052893,
+    "structure": {
+      "real_pp": 67.39838473203265,
+      "shuffled_pp": 1541.7722543289003,
+      "ratio": 22.875507483729606
+    },
+    "role_swap": {
+      "n": 500,
+      "correct_preferred_pct": 0.72,
+      "avg_correct_nll": 19.816023071289063,
+      "avg_swapped_nll": 24.237404670715332
+    }
+  }
+}

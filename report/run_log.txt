@@ -1,0 +1,65 @@
+Generating 20000 MicroEnglish sentences...
+Generating 20000 Conlang-Regular sentences...
+
+--- training tiny transformer on microenglish ---
+step     1  train 84.9564  val 81.9485  (0.4s)
+step   100  train 6.2907  val 6.1785  (26.5s)
+step   200  train 4.3071  val 4.4302  (49.8s)
+step   300  train 3.8903  val 3.8710  (71.5s)
+step   400  train 3.5065  val 3.5544  (93.1s)
+step   500  train 3.2184  val 3.2265  (108.2s)
+step   600  train 3.1478  val 3.0744  (126.1s)
+step   700  train 2.9438  val 2.9683  (142.9s)
+step   800  train 2.9211  val 2.8798  (159.6s)
+step   900  train 2.8745  val 2.8497  (180.1s)
+step  1000  train 2.7916  val 2.8300  (196.2s)
+step  1100  train 2.7876  val 2.7576  (211.2s)
+step  1200  train 2.7401  val 2.7446  (227.7s)
+step  1300  train 2.7511  val 2.7369  (247.1s)
+step  1400  train 2.7331  val 2.7192  (264.4s)
+step  1500  train 2.6814  val 2.6854  (278.5s)
+
+--- training tiny transformer on conlang ---
+step     1  train 83.0798  val 80.0698  (0.3s)
+step   100  train 7.0954  val 7.1427  (16.3s)
+step   200  train 5.0370  val 5.0781  (35.4s)
+step   300  train 4.4266  val 4.3939  (53.1s)
+step   400  train 4.1823  val 4.1140  (74.6s)
+step   500  train 3.9584  val 3.9532  (91.6s)
+step   600  train 3.8484  val 3.8074  (108.0s)
+step   700  train 3.6980  val 3.7161  (122.5s)
+step   800  train 3.5875  val 3.6468  (136.8s)
+step   900  train 3.5543  val 3.5040  (155.1s)
+step  1000  train 3.4538  val 3.5066  (172.4s)
+step  1100  train 3.4567  val 3.4397  (191.7s)
+step  1200  train 3.4390  val 3.3743  (207.1s)
+step  1300  train 3.3771  val 3.3773  (221.1s)
+step  1400  train 3.3497  val 3.3924  (240.9s)
+step  1500  train 3.3427  val 3.3665  (260.7s)
+
+
+=================== SUMMARY ===================
+
+microenglish
+  vocab_size        151
+  n_tokens          151055
+  type_token_ratio  0.0010
+  avg_sent_len      7.55
+  zipf_slope        -0.953
+  bigram_pp         16.289
+  trigram_pp        22.606
+  transformer final_val_loss  2.6854
+  transformer val_perplexity  14.665
+  transformer n_params        821120
+
+conlang
+  vocab_size        193
+  n_tokens          121076
+  type_token_ratio  0.0016
+  avg_sent_len      6.05
+  zipf_slope        -0.764
+  bigram_pp         29.019
+  trigram_pp        50.304
+  transformer final_val_loss  3.3665
+  transformer val_perplexity  28.976
+  transformer n_params        826496

@@ -1,0 +1,78 @@
+{
+  "english": {
+    "stats": {
+      "n_sentences": 20000,
+      "n_tokens": 152282,
+      "vocab_size": 151,
+      "type_token_ratio": 0.0009915814081769348,
+      "unigram_entropy_nats": 4.049532624879234,
+      "unigram_perplexity": 57.37063716998738,
+      "zipf_slope": -0.9561530596151007,
+      "bigram_perplexity": 16.233863793471375,
+      "avg_sent_len": 7.6141,
+      "sent_len_p50": 6,
+      "sent_len_p90": 13,
+      "sent_len_p99": 20,
+      "trigram_perplexity": 22.502233876578778
+    },
+    "training": {
+      "n_params": 821120,
+      "vocab_size": 153,
+      "final_train": 2.6932883262634277,
+      "final_val": 2.723386764526367,
+      "val_perplexity": 15.231821580668074
+    },
+    "probes": {
+      "held_out_pp": 62.1012788119033,
+      "structure": {
+        "real_pp": 59.25105335738883,
+        "shuffled_pp": 2116.147040174013,
+        "ratio": 35.71492691294275
+      },
+      "role_swap": {
+        "n": 500,
+        "correct_preferred_pct": 0.796,
+        "avg_correct_nll": 24.83600298690796,
+        "avg_swapped_nll": 27.94141307067871
+      }
+    }
+  },
+  "agglutinative": {
+    "stats": {
+      "n_sentences": 20000,
+      "n_tokens": 121933,
+      "vocab_size": 193,
+      "type_token_ratio": 0.00158283647576948,
+      "unigram_entropy_nats": 4.524479630023869,
+      "unigram_perplexity": 92.24791029394223,
+      "zipf_slope": -0.7697551874909804,
+      "bigram_perplexity": 28.990353074070068,
+      "avg_sent_len": 6.09665,
+      "sent_len_p50": 5,
+      "sent_len_p90": 11,
+      "sent_len_p99": 16,
+      "trigram_perplexity": 50.21294074490679
+    },
+    "training": {
+      "n_params": 826496,
+      "vocab_size": 195,
+      "final_train": 3.322335720062256,
+      "final_val": 3.356111526489258,
+      "val_perplexity": 28.67746224081865
+    },
+    "probes": {
+      "held_out_pp": 1307006.5688097107,
+      "structure": {
+        "real_pp": 1312678.9892511065,
+        "shuffled_pp": 2394170.177011194,
+        "ratio": 1.823880930993713
+      },
+      "role_swap": {
+        "n": 500,
+        "correct_preferred_pct": 0.036,
+        "avg_correct_nll": 64.11706980895995,
+        "avg_swapped_nll": 64.10574716186524
+      }
+    }
+  }
+}

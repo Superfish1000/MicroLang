@@ -1,0 +1,61 @@
+
+
+########## PRESET: english ##########
+Generated 20000 sentences. vocab=151
+step     1  train 85.0799  val 82.3745  (0.4s)
+step   150  train 4.9106  val 4.8636  (26.2s)
+step   300  train 3.8104  val 3.8873  (59.6s)
+step   450  train 3.3849  val 3.4457  (94.8s)
+step   600  train 3.1380  val 3.1546  (130.9s)
+step   750  train 2.9225  val 2.9634  (156.5s)
+step   900  train 2.8700  val 2.8992  (180.8s)
+step  1050  train 2.7677  val 2.7657  (209.7s)
+step  1200  train 2.7171  val 2.8209  (233.1s)
+step  1350  train 2.7312  val 2.8024  (257.7s)
+step  1500  train 2.6933  val 2.7234  (278.1s)
+
+=== Probes: english ===
+  held-out PP:       62.101
+  real PP:           59.251
+  shuffled PP:       2116.147
+  structure ratio:   35.715x  (higher = more structure-aware)
+  role-swap correct: 79.6% of 500
+    avg NLL correct: 24.836
+    avg NLL swapped: 27.941
+
+
+########## PRESET: agglutinative ##########
+Generated 20000 sentences. vocab=193
+step     1  train 84.3673  val 81.8431  (0.4s)
+step   150  train 6.1405  val 6.2762  (28.6s)
+step   300  train 4.5246  val 4.4985  (53.3s)
+step   450  train 4.0104  val 4.0987  (75.8s)
+step   600  train 3.8169  val 3.7954  (107.4s)
+step   750  train 3.6450  val 3.6765  (133.2s)
+step   900  train 3.5864  val 3.5118  (163.7s)
+step  1050  train 3.4521  val 3.4756  (189.4s)
+step  1200  train 3.4224  val 3.4023  (221.6s)
+step  1350  train 3.3346  val 3.4010  (246.3s)
+step  1500  train 3.3223  val 3.3561  (270.2s)
+
+=== Probes: agglutinative ===
+  held-out PP:       1307006.569
+  real PP:           1312678.989
+  shuffled PP:       2394170.177
+  structure ratio:   1.824x  (higher = more structure-aware)
+  role-swap correct: 3.6% of 500
+    avg NLL correct: 64.117
+    avg NLL swapped: 64.106
+
+
+================ UNIFIED SUMMARY ================
+
+english
+  vocab=151  tokens=152282  zipf=-0.956
+  trigram_pp=22.50  transformer val_pp=15.23
+  probes: held_out_pp=62.10  structure_ratio=35.71x  role_swap_correct=79.6%
+
+agglutinative
+  vocab=193  tokens=121933  zipf=-0.770
+  trigram_pp=50.21  transformer val_pp=28.68
+  probes: held_out_pp=1307006.57  structure_ratio=1.82x  role_swap_correct=3.6%
